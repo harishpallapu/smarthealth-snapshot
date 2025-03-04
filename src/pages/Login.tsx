@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { toast } from 'sonner';
 import Layout from '@/components/Layout';
 import { motion } from 'framer-motion';
 import { Activity, Lock, Mail, ArrowRight } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +15,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
+  const { login } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,19 +27,19 @@ const Login = () => {
     
     setIsLoading(true);
     
-    // Simulate login API call
-    setTimeout(() => {
-      // For demo, we'll just check if email contains "demo"
-      if (email.includes('demo')) {
+    try {
+      const success = await login(email, password);
+      if (success) {
         toast.success('Successfully logged in!');
         navigate('/dashboard');
       } else {
-        // For demo, let's allow any credentials
-        toast.success('Successfully logged in!');
-        navigate('/dashboard');
+        toast.error('Invalid credentials');
       }
+    } catch (error) {
+      toast.error('An error occurred during login');
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (

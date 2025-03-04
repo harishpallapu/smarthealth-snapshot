@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import { motion } from 'framer-motion';
@@ -11,20 +11,30 @@ import SleepTracker from '@/components/HealthMetrics/SleepTracker';
 import WaterIntakeTracker from '@/components/HealthMetrics/WaterIntakeTracker';
 import NutritionTracker from '@/components/HealthMetrics/NutritionTracker';
 import WorkoutTracker from '@/components/HealthMetrics/WorkoutTracker';
+import { useUser } from '@/contexts/UserContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
+  const { user, isLoggedIn } = useUser();
   
-  // Simulated data
-  const userData = {
-    name: 'Alex Morgan',
-    steps: 8435,
-    caloriesBurned: 340,
-    waterIntake: 5,
-    weight: '68.2 kg',
-    height: '175 cm',
-    bmi: 22.3,
-  };
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoggedIn, navigate]);
+  
+  // Check URL query params for tab selection
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const tabParam = queryParams.get('tab');
+    if (tabParam && ['overview', 'heart', 'sleep', 'bmi', 'water', 'nutrition', 'workout', 'profile'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [location.search]);
 
   // Animation variants for staggered children
   const containerVariants = {
@@ -48,6 +58,24 @@ const Dashboard = () => {
         damping: 24
       }
     }
+  };
+
+  // Early return if not logged in
+  if (!isLoggedIn || !user) {
+    return null;
+  }
+
+  // Simulated data merged with user data
+  const userData = {
+    name: user.name,
+    steps: 8435,
+    caloriesBurned: 340,
+    waterIntake: 5,
+    weight: user.weight || '68.2 kg',
+    height: user.height || '175 cm',
+    bmi: user.bmi || 22.3,
+    age: user.age || 32,
+    memberSince: user.memberSince || 'January 2023'
   };
 
   return (
@@ -79,7 +107,10 @@ const Dashboard = () => {
             ].map((tab) => (
               <motion.button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  navigate(`/dashboard?tab=${tab.id}`);
+                }}
                 className={`flex items-center space-x-2 px-4 py-2 border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-health-blue text-health-blue'
@@ -266,7 +297,7 @@ const Dashboard = () => {
               <div className="flex-1 space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold">{userData.name}</h2>
-                  <p className="text-slate-600">Member since January 2023</p>
+                  <p className="text-slate-600">Member since {userData.memberSince}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -284,7 +315,7 @@ const Dashboard = () => {
                   </div>
                   <div className="border border-slate-200 rounded-lg p-4">
                     <p className="text-sm text-slate-500 mb-1">Age</p>
-                    <p className="text-lg font-medium">32</p>
+                    <p className="text-lg font-medium">{userData.age}</p>
                   </div>
                 </div>
                 

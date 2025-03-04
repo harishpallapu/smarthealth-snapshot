@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import { AnimatePresence } from "framer-motion";
 import PageTransition from "./components/PageTransition";
+import { UserProvider } from "./contexts/UserContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,11 +41,13 @@ const AnimatedRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner position="top-right" closeButton theme="light" richColors />
-      <BrowserRouter>
-        <AnimatedRoutes />
-      </BrowserRouter>
+      <UserProvider>
+        <Toaster />
+        <Sonner position="top-right" closeButton theme="light" richColors />
+        <BrowserRouter>
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </UserProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

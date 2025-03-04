@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { toast } from 'sonner';
 import Layout from '@/components/Layout';
 import { motion } from 'framer-motion';
 import { Activity, User, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -17,6 +17,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
+  const { register } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +39,19 @@ const Register = () => {
     
     setIsLoading(true);
     
-    // Simulate registration API call
-    setTimeout(() => {
-      toast.success('Account created successfully!');
-      navigate('/dashboard');
+    try {
+      const success = await register(name, email, password);
+      if (success) {
+        toast.success('Account created successfully!');
+        navigate('/dashboard');
+      } else {
+        toast.error('Registration failed');
+      }
+    } catch (error) {
+      toast.error('An error occurred during registration');
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (

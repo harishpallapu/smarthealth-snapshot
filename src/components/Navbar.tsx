@@ -1,14 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Activity, User, LogOut } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
+import { toast } from 'sonner';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const isLoggedIn = location.pathname.includes('dashboard');
+  const navigate = useNavigate();
+  const { user, isLoggedIn, logout } = useUser();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +21,13 @@ const Navbar: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Successfully logged out');
+    navigate('/');
+    setIsMenuOpen(false);
+  };
 
   return (
     <header 
@@ -54,18 +64,16 @@ const Navbar: React.FC = () => {
                 </Link>
                 <div className="flex items-center space-x-4">
                   <Link 
-                    to="/dashboard/profile" 
+                    to="/dashboard?tab=profile" 
                     className="flex items-center space-x-1 text-sm font-medium text-slate-700 hover:text-health-blue transition-colors"
                   >
                     <User className="h-4 w-4" />
-                    <span>Profile</span>
+                    <span>{user?.name || 'Profile'}</span>
                   </Link>
-                  <Link to="/">
-                    <Button size="sm" variant="outline" className="flex items-center space-x-1">
-                      <LogOut className="h-4 w-4" />
-                      <span>Sign out</span>
-                    </Button>
-                  </Link>
+                  <Button size="sm" variant="outline" className="flex items-center space-x-1" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4" />
+                    <span>Sign out</span>
+                  </Button>
                 </div>
               </>
             ) : (
@@ -117,21 +125,20 @@ const Navbar: React.FC = () => {
                     Dashboard
                   </Link>
                   <Link 
-                    to="/dashboard/profile" 
+                    to="/dashboard?tab=profile" 
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-slate-100 ${
                       location.pathname === '/dashboard/profile' ? 'text-health-blue' : 'text-slate-700'
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Profile
+                    {user?.name || 'Profile'}
                   </Link>
-                  <Link 
-                    to="/" 
-                    className="px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-slate-100 text-slate-700"
-                    onClick={() => setIsMenuOpen(false)}
+                  <button 
+                    className="px-4 py-2 rounded-md text-sm font-medium transition-colors hover:bg-slate-100 text-slate-700 text-left"
+                    onClick={handleLogout}
                   >
                     Sign out
-                  </Link>
+                  </button>
                 </>
               ) : (
                 <>
