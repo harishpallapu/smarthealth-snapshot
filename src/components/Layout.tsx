@@ -9,17 +9,21 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-health-light to-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-health-light to-white overflow-hidden">
       <Navbar />
       <motion.main 
         className="flex-1 container mx-auto px-4 py-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ 
+          duration: 0.3,
+          ease: "easeInOut"
+        }}
       >
         {children}
       </motion.main>
-      <footer className="py-6 border-t border-slate-200">
+      <footer className="py-6 border-t border-slate-200 bg-white/50 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-slate-500">

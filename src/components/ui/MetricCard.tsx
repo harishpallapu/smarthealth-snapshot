@@ -42,7 +42,15 @@ const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <motion.div
       whileHover={{ y: -5 }}
-      transition={{ type: 'spring', stiffness: 300 }}
+      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 300, 
+        duration: 0.3,
+        delay: Math.random() * 0.2 // Slight random delay for staggered effect
+      }}
     >
       <Card 
         className={cn(
@@ -53,16 +61,36 @@ const MetricCard: React.FC<MetricCardProps> = ({
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          {icon && <div className="opacity-70">{icon}</div>}
+          {icon && (
+            <motion.div 
+              className="opacity-70"
+              whileHover={{ rotate: 10, scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              {icon}
+            </motion.div>
+          )}
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-semibold">{value}</div>
+          <motion.div 
+            className="text-2xl font-semibold"
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            {value}
+          </motion.div>
           {description && <CardDescription className="mt-2 text-xs">{description}</CardDescription>}
           {trend && trendValue && (
-            <div className={`flex items-center mt-2 text-xs ${getTrendColor()}`}>
+            <motion.div 
+              className={`flex items-center mt-2 text-xs ${getTrendColor()}`}
+              initial={{ opacity: 0, x: -5 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
               <span>{getTrendIcon()}</span>
               <span className="ml-1">{trendValue}</span>
-            </div>
+            </motion.div>
           )}
         </CardContent>
         {footer && <CardFooter className="pt-0">{footer}</CardFooter>}
