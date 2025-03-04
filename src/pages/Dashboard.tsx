@@ -3,11 +3,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/Layout';
 import { motion } from 'framer-motion';
-import { HeartPulse, Activity, Moon, Scale, Apple, Utensils, Droplet, User } from 'lucide-react';
+import { HeartPulse, Activity, Moon, Scale, Apple, Utensils, Droplet, User, Dumbbell } from 'lucide-react';
 import MetricCard from '@/components/ui/MetricCard';
 import BMICalculator from '@/components/HealthMetrics/BMICalculator';
 import HeartRateMonitor from '@/components/HealthMetrics/HeartRateMonitor';
 import SleepTracker from '@/components/HealthMetrics/SleepTracker';
+import WaterIntakeTracker from '@/components/HealthMetrics/WaterIntakeTracker';
+import NutritionTracker from '@/components/HealthMetrics/NutritionTracker';
+import WorkoutTracker from '@/components/HealthMetrics/WorkoutTracker';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -21,6 +24,30 @@ const Dashboard = () => {
     weight: '68.2 kg',
     height: '175 cm',
     bmi: 22.3,
+  };
+
+  // Animation variants for staggered children
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24
+      }
+    }
   };
 
   return (
@@ -39,38 +66,44 @@ const Dashboard = () => {
         
         {/* Dashboard Tabs */}
         <div className="mb-8">
-          <nav className="flex space-x-2 border-b border-slate-200">
+          <nav className="flex space-x-2 border-b border-slate-200 overflow-x-auto pb-px hide-scrollbar">
             {[
               { id: 'overview', label: 'Overview', icon: <Activity className="h-4 w-4" /> },
               { id: 'heart', label: 'Heart Rate', icon: <HeartPulse className="h-4 w-4" /> },
               { id: 'sleep', label: 'Sleep', icon: <Moon className="h-4 w-4" /> },
               { id: 'bmi', label: 'BMI', icon: <Scale className="h-4 w-4" /> },
+              { id: 'water', label: 'Water', icon: <Droplet className="h-4 w-4" /> },
+              { id: 'nutrition', label: 'Nutrition', icon: <Utensils className="h-4 w-4" /> },
+              { id: 'workout', label: 'Workout', icon: <Dumbbell className="h-4 w-4" /> },
               { id: 'profile', label: 'Profile', icon: <User className="h-4 w-4" /> },
             ].map((tab) => (
-              <button
+              <motion.button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-2 border-b-2 transition-colors ${
+                className={`flex items-center space-x-2 px-4 py-2 border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-health-blue text-health-blue'
                     : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
                 }`}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.97 }}
               >
                 {tab.icon}
                 <span>{tab.label}</span>
-              </button>
+              </motion.button>
             ))}
           </nav>
         </div>
         
         {/* Overview Tab */}
         {activeTab === 'overview' && (
-          <div className="space-y-8">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-8"
+          >
+            <motion.div variants={itemVariants}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <MetricCard
                   title="Steps"
@@ -105,24 +138,39 @@ const Dashboard = () => {
               </div>
             </motion.div>
             
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.3 }}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-1">
-                  <BMICalculator />
-                </div>
-                <div className="md:col-span-1">
+            <motion.div variants={itemVariants}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
                   <HeartRateMonitor />
                 </div>
-                <div className="md:col-span-1">
+                <div>
                   <SleepTracker />
                 </div>
               </div>
             </motion.div>
-          </div>
+            
+            <motion.div variants={itemVariants}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <WaterIntakeTracker />
+                </div>
+                <div>
+                  <BMICalculator />
+                </div>
+              </div>
+            </motion.div>
+            
+            <motion.div variants={itemVariants}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <NutritionTracker />
+                </div>
+                <div>
+                  <WorkoutTracker />
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
         
         {/* Heart Rate Tab */}
@@ -158,6 +206,42 @@ const Dashboard = () => {
             className="grid grid-cols-1 gap-6"
           >
             <BMICalculator />
+          </motion.div>
+        )}
+        
+        {/* Water Tab */}
+        {activeTab === 'water' && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 gap-6"
+          >
+            <WaterIntakeTracker />
+          </motion.div>
+        )}
+        
+        {/* Nutrition Tab */}
+        {activeTab === 'nutrition' && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 gap-6"
+          >
+            <NutritionTracker />
+          </motion.div>
+        )}
+        
+        {/* Workout Tab */}
+        {activeTab === 'workout' && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 gap-6"
+          >
+            <WorkoutTracker />
           </motion.div>
         )}
         

@@ -8,6 +8,27 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  // Animation variants for staggered animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+        duration: 0.5
+      }
+    },
+    exit: {
+      opacity: 0,
+      transition: { 
+        staggerChildren: 0.05,
+        staggerDirection: -1,
+        duration: 0.3
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-health-light to-white overflow-hidden">
       <Navbar />
@@ -21,7 +42,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           ease: "easeInOut"
         }}
       >
-        {children}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          {children}
+        </motion.div>
       </motion.main>
       <footer className="py-6 border-t border-slate-200 bg-white/50 backdrop-blur-sm">
         <div className="container mx-auto px-4">

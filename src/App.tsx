@@ -12,7 +12,14 @@ import NotFound from "./pages/NotFound";
 import { AnimatePresence } from "framer-motion";
 import PageTransition from "./components/PageTransition";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -34,7 +41,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <Sonner position="top-right" closeButton theme="light" richColors />
       <BrowserRouter>
         <AnimatedRoutes />
       </BrowserRouter>
